@@ -12,16 +12,16 @@ class CalculationsController < ApplicationController
 
     text_split_into_array = @text.split
     text_withoutspaces = @text.gsub(/ /,"")
-    occurrences_count = @text.scan(@special_word)
+    occurrences_count = @text.scan(@special_word.gsub(/ /,""))
 
-    @word_count = text_split_into_array
+    @word_count = text_split_into_array.count
 
     @character_count_with_spaces = @text.size
 
     @character_count_without_spaces = text_withoutspaces.size
     # can we use something like scan? @character_count_with_spaces-@word_count+1
 
-    @occurrences = text_split_into_array.count(special_word)
+    @occurrences = occurrences_count.size
 
     # ================================================================================
     # Your code goes above.
@@ -31,7 +31,7 @@ class CalculationsController < ApplicationController
   end
 
   def loan_payment
-    @apr = params[:annual_percentage_rate].to_f
+    @apr = (params[:annual_percentage_rate].to_f)
     @years = params[:number_of_years].to_i
     @principal = params[:principal_value].to_f
 
@@ -41,8 +41,10 @@ class CalculationsController < ApplicationController
     # The number of years the user input is in the integer @years.
     # The principal value the user input is in the decimal @principal.
     # ================================================================================
-
-    @monthly_payment = "Replace this string with your answer."
+    months= @years*12
+    numerator=@principal*(@apr/100/12)
+    denominator=1-(1+(@apr/100/12))**(-months)
+    @monthly_payment = numerator / denominator
 
     # ================================================================================
     # Your code goes above.
@@ -64,12 +66,12 @@ class CalculationsController < ApplicationController
     #   number of seconds as a result.
     # ================================================================================
 
-    @seconds = "Replace this string with your answer."
-    @minutes = "Replace this string with your answer."
-    @hours = "Replace this string with your answer."
-    @days = "Replace this string with your answer."
-    @weeks = "Replace this string with your answer."
-    @years = "Replace this string with your answer."
+    @seconds = @ending-@starting
+    @minutes = @seconds/60
+    @hours = @minutes/60
+    @days = @hours/24
+    @weeks = @days/7
+    @years = @days/365.25
 
     # ================================================================================
     # Your code goes above.
@@ -86,23 +88,32 @@ class CalculationsController < ApplicationController
     # The numbers the user input are in the array @numbers.
     # ================================================================================
 
-    @sorted_numbers = "Replace this string with your answer."
+    @sorted_numbers = @numbers.sort
 
-    @count = "Replace this string with your answer."
+    @count = @numbers.count
 
-    @minimum = "Replace this string with your answer."
+    @minimum = @numbers.min
 
-    @maximum = "Replace this string with your answer."
+    @maximum = @numbers.max
 
-    @range = "Replace this string with your answer."
+    @range = @maximum - @minimum
 
-    @median = "Replace this string with your answer."
+    def median                        #Define your method accepting an array as an argument.
+      if @sorted_numbers.length.odd?                   #is the length of the array odd?
+        return @sorted_numbers[(@sorted_numbers.length - 1) / 2] #find value at this index
+      else @sorted_numbers.length.even?               #is the length of the array even?
+        return ( @sorted_numbers[@sorted_numbers.length/2] + @sorted_numbers[@sorted_numbers.length/2 - 1] )/2.to_f
+        #average the values found at these two indexes and convert to float
+      end
+    end
 
-    @sum = "Replace this string with your answer."
+    @median = median
 
-    @mean = "Replace this string with your answer."
+    @sum = @numbers.sum
 
-    @variance = "Replace this string with your answer."
+    @mean = @numbers.sum / @count
+
+    @variance = @sum{|i| (i-@mean)**2} / @count
 
     @standard_deviation = "Replace this string with your answer."
 
