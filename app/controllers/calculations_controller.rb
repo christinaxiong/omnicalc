@@ -12,7 +12,7 @@ class CalculationsController < ApplicationController
 
     text_split_into_array = @text.split
     text_withoutspaces = @text.gsub(/ /,"")
-    occurrences_count = @text.scan(@special_word.gsub(/ /,""))
+    occurrences_count = @text.downcase.scan(@special_word.downcase.gsub(/ /,""))
 
     @word_count = text_split_into_array.count
 
@@ -21,7 +21,7 @@ class CalculationsController < ApplicationController
     @character_count_without_spaces = text_withoutspaces.size
     # can we use something like scan? @character_count_with_spaces-@word_count+1
 
-    @occurrences = occurrences_count.size
+    @occurrences = occurrences_count.length
 
     # ================================================================================
     # Your code goes above.
@@ -98,26 +98,64 @@ class CalculationsController < ApplicationController
 
     @range = @maximum - @minimum
 
-    def median                        #Define your method accepting an array as an argument.
-      if @sorted_numbers.length.odd?                   #is the length of the array odd?
-        return @sorted_numbers[(@sorted_numbers.length - 1) / 2] #find value at this index
-      else @sorted_numbers.length.even?               #is the length of the array even?
-        return ( @sorted_numbers[@sorted_numbers.length/2] + @sorted_numbers[@sorted_numbers.length/2 - 1] )/2.to_f
+    def median(array)                       #Define your method accepting an array as an argument.
+      sorted_array= array.sort
+      if sorted_array.length.odd?                   #is the length of the array odd?
+        return sorted_array[(sorted_array.length - 1) / 2] #find value at this index
+      else sorted_array.length.even?               #is the length of the array even?
+        return ( sorted_array[sorted_array.length/2] + sorted_array[sorted_array.length/2 - 1] )/2.to_f
         #average the values found at these two indexes and convert to float
       end
     end
 
-    @median = median
+    @median = median(@numbers)
 
     @sum = @numbers.sum
 
-    @mean = @numbers.sum / @count
+    def mean(array)
+      array.inject(0) { |sum, x| sum += x } / array.size.to_f
+    end
+    @mean = mean(@numbers)
 
-    @variance = @sum{|i| (i-@mean)**2} / @count
+    def variance(array)
+      m = mean(array)
+      array.inject(0) { |variance, x| variance += (x - m) ** 2 } /(array.size.to_f)
+    end
+    @variance = variance(@numbers)
 
-    @standard_deviation = "Replace this string with your answer."
+    @standard_deviation = Math.sqrt(@variance)
 
-    @mode = "Replace this string with your answer."
+    require 'set'
+
+    def mode(array)
+      n_set = array.to_set
+
+      # Element that achieved biggest count
+      elem_max_count = 0
+      # Actual max count from array
+      max_count = 0
+
+      for set_element in n_set
+        count = 0
+
+        # Get current count for current set element
+        for arr_element in array
+          if set_element == arr_element
+            count = count + 1
+          end
+        end
+
+        # Update max count
+        if count > max_count
+          max_count = count
+          elem_max_count = set_element
+        end
+      end
+
+      return elem_max_count
+    end
+
+  @mode =mode(@numbers)
 
     # ================================================================================
     # Your code goes above.
